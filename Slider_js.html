@@ -50,7 +50,7 @@
         function atuoSlide() {
             clearInterval(intervalTime);
             intervalTime = setInterval(() => {
-                let index = (nowIndex + 1) % length;
+                let index = (nowIndex + 1) % imgList.length;
                 sliderSlide(index);
             }, 3000);
         }
