@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="ja">
+<style>
+    body {
+        margin: 0px;
+    }
+
+    #pagetop {
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #000;
+        color: #fff;
+        padding: 10px;
+        text-decoration: none;
+    }
+
+    #colorpick {
+        margin: 0;
+    }
+
+    #colorval {
+        margin: 0;
+    }
+
+    .bgchange {
+        background: aqua;
+    }
+
+    .red {
+        color: red;
+    }
+
+    .normal {
+        color: #000;
+    }
+
+    #btnsubmit {
+        padding: 6px;
+        border-radius: 15px;
+        background: aqua;
+    }
+
+    #btnsubmit:disabled {
+        background: #ccc;
+    }
+
+    #bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: aqua;
+        height: 10px;
+    }
+
+    #heading {
+        color: #fff;
+        display: inline-block;
+        background-image: linear-gradient(90deg, aqua, aqua 50%, #fff 50%, #fff);
+        background-size: 200% 100%;
+        margin: 0 0 30px 0;
+    }
+
+    #list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-around;
+    }
+
+    .item {
+        margin: 0;
+        opacity: 0;
+    }
+
+    .item .img_content {
+        margin: 0;
+        position: relative;
+        overflow: hidden;
+        display: block;
+    }
+
+    .item .img_content::before {
+        margin: 0;
+        background: aqua;
+        position: absolute;
+        content: '';
+        display: block;
+        inset: 0;
+
+    }
+
+    * #test {
+        margin-bottom: 100px;
+    }
+
+    #container {
+        width: 600px;
+    }
+
+    ul.list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+
+    ul.list li {
+        flex: 1 1 calc(33.333% - 10px);
+        box-sizing: border-box;
+        margin: 5px;
+        list-style: none;
+    }
+
+    #button {
+        margin: 0;
+    }
+
+    #modal {
+        position: absolute;
+        inset: 10rem 0 auto;
+        width: 600px;
+        height: 300px;
+        background-color: #ccc;
+        border-radius: 15px;
+        margin: 0;
+        z-index: 9999;
+        margin: auto;
+        visibility: hidden;
+    }
+
+    #background {
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        background-color: #33333390;
+        z-index: 9998;
+        opacity: 0.5;
+        visibility: hidden;
+        inset: 0;
+
+    }
+
+</style>
+
+
+<head>
+    <meta charset="UTF-8">
+    <title>JavaScript File Loading</title>
+
+</head>
+
+<body>
+    <div id="container" style="height: 2000px;">
+        <!--モーダルウインドウ-->
+        <div id="background"></div>
+        <button id="open">CLICK</button>
+        <div id="modal">
+            <button id="close">CLOSE</button>
+        </div>
+
+        <!--画像サムネイル-->
+        <!-- ('#container ') -->
+        <div id="container">
+            <!-- ('.main') -->
+            <div class="main">
+                <!-- ('img') -->
+                <img src="img/03.jpg">
+            </div>
+            <!-- ('.thumbnail') -->
+            <div class="thumbnail">
+                <ul class="list">
+                    <!-- ('img') -->
+                    <li><img src="img/03.jpg" alt="03" style="width: 30%; height: auto;"></li>
+                    <li><img src="img/04.jpg" alt="04" style="width: 30%; height: auto;"></li>
+                    <li><img src="img/05.jpg" alt="05" style="width: 30%; height: auto;"></li>
+                </ul>
+            </div>
+        </div>
+
+        <!--画像リスト-->
+        <div id="list">
+            <!-- .img_contentリストを格納　-->
+        </div>
+        <div id="test01"><img src="img/01.jpg"></div>
+        <div id="test02"><img src="img/01.jpg"></div>
+    </div>
+    <a href="#" id="pagetop">link</a>
+</body>
+<script>
+    /* ポップアップモーダルウインドウ */
+    document.addEventListener('DOMContentLoaded', function () {
+        const open = document.querySelector('#open');
+        const close = document.querySelector('#close');
+        const modal = document.querySelector('#modal');
+        const background = document.querySelector('#background');
+        const keyframe_show = {
+            opacity: [0, 1],
+            visibility: 'visible',
+        };
+        const keyframe_hide = {
+            opacity: [1, 0],
+            visibility: 'hidden',
+        };
+        const option = {
+            duration: 600,
+            easing: 'ease',
+            fill: 'forwards'
+        };
+        open.addEventListener('click', function () {
+            modal.animate(keyframe_show, option);
+            background.animate(keyframe_show, option);
+        });
+        close.addEventListener('click', function () {
+            modal.animate(keyframe_hide, option);
+            background.animate(keyframe_hide, option);
+        });
+        background.addEventListener('click', function () {
+            close.click();
+        })
+    });
+
+    /* 画像サムネイルギャラリー　*/
+    document.addEventListener('DOMContentLoaded', function () {
+        const mainImg = document.querySelector("#container .main img");
+        const thumbnail = document.querySelectorAll("#container .thumbnail img");
+        thumbnail.forEach((item) => {
+            item.addEventListener('click', (event) => {
+                const keyframe = {
+                    opacity: [0, 1],
+                };
+                const option = {
+                    duration: 2000,
+                    easing: 'ease'
+                };
+                mainImg.animate(keyframe, option)
+                mainImg.src = event.target.src;
+            });
+        });
+    });
+
+    /* 画像読み込み配置 */
+    document.addEventListener('DOMContentLoaded', function () {
+        const imgList = [
+            { name: "01", img: "img/01.jpg", size: "300" },
+            { name: "02", img: "img/02.jpg", size: "300" },
+            { name: "03", img: "img/03.jpg", size: "300" },
+            { name: "04", img: "img/04.jpg", size: "300" },
+            { name: "05", img: "img/05.jpg", size: "300" },
+            { name: "06", img: "img/06.jpg", size: "300" },
+        ];
+        const list = document.querySelector("#list");
+        imgList.forEach((item, i) => {
+            const { name, img, size } = item;
+            const content = `<div class="item">
+            <div class="img_content"><img src="${img}"></div>
+            <h2>${name}</h2>
+            <p>${size}</P>
+            </div>`;
+            list.insertAdjacentHTML("beforebegin", content);
+            const alltarget = list.previousElementSibling
+            const keyframe = {
+                opacity: [0, 1],
+            };
+            const option = {
+                duration: 2000,
+                easing: 'ease',
+                delay: 300 * i,
+                fill: 'forwards'
+            };
+            alltarget.animate(keyframe, option)
+        });
+    });
+
+    /* リスト画像にアニメーション付与 */
+    document.addEventListener('DOMContentLoaded', function () {
+        const img_content = document.querySelectorAll(".img_content");
+        const animeScroll = (item, observer) => {
+            item.forEach((event) => {
+                if (event.isIntersecting) {
+                    const keyframe = {
+                        translate: [0, '100%'],
+                    };
+                    const option = {
+                        duration: 2000,
+                        pseudoElement: '::before',
+                        easing: 'ease',
+                        fill: 'forwards'
+                    };
+                    event.target.animate(keyframe, option);
+                    observer.unobserve(event.target);
+                };
+            });
+        };
+        const observer = new IntersectionObserver(animeScroll);
+        img_content.forEach((val) => {
+            observer.observe(val);
+        });
+    });
+
+    /* 右から流れる画像 */
+    document.addEventListener('DOMContentLoaded', function () {
+        const alltarget = document.querySelectorAll("#test01,#test02");
+        const animeScroll = (item, observer) => {
+            item.forEach((event) => {
+                if (event.isIntersecting) {
+                    const keyframe = {
+                        opacity: [0, 1],
+                        translate: ['50px 0', 0]
+                    };
+                    const option = {
+                        duration: 2000,
+                        easing: 'ease'
+                    };
+                    event.target.animate(keyframe, option);
+                };
+            });
+        };
+        const observer = new IntersectionObserver(animeScroll);
+        alltarget.forEach((val) => {
+            observer.observe(val);
+        });
+    });
+
+</script>
+
+</html>
