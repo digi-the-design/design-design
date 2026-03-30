@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JavaScript File Loading</title>
     <link rel="stylesheet" href="style.css">
+
 </head>
 
 <body>
@@ -45,11 +46,15 @@
 
         let length = imgList.length - 1;
         let nowIndex = 0;
-        let intervalTime = setInterval(() => {
-            let index = (nowIndex + 1) % 6;
-            sliderSlide(index);
-        }, 3000);
-
+        let intervalTime;
+        function atuoSlide() {
+            clearInterval(intervalTime);
+            intervalTime = setInterval(() => {
+                let index = (nowIndex + 1) % length;
+                sliderSlide(index);
+            }, 3000);
+        }
+        atuoSlide();
         const imageSlide = sliderInner.querySelectorAll("li");
         const dotNavigation = navContainer.querySelectorAll("li");
 
@@ -80,11 +85,6 @@
                 index = length;
             }
             sliderSlide(index);
-            clearInterval(intervalTime);
-            let intervalTime = setInterval(() => {
-                let index = (nowIndex + 1) % 6;
-                sliderSlide(index);
-            }, 3000);
         });
         document.getElementById("arrow-next").addEventListener('click', () => {
             let index = nowIndex + 1;
@@ -92,21 +92,11 @@
                 index = 0;
             }
             sliderSlide(index);
-            clearInterval(intervalTime);
-            let intervalTime = setInterval(() => {
-                let index = (nowIndex + 1) % 6;
-                sliderSlide(index);
-            }, 3000);
         });
         dotNavigation.forEach((nav) => {
             nav.addEventListener('click', () => {
                 let index = Number(nav.getAttribute("data-nav-index"));
                 sliderSlide(index);
-                clearInterval(intervalTime);
-                let intervalTime = setInterval(() => {
-                    let index = (nowIndex + 1) % 6;
-                    sliderSlide(index);
-                }, 3000);
             });
         });
     </script>
