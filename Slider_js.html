@@ -25,85 +25,97 @@
     <script>
         // スライダーに表示する画像のパス
         const imgList = [
-            "img/01.jpg",
-            "img/02.jpg",
-            "img/03.jpg",
-            "img/04.jpg",
-            "img/05.jpg",
-            "img/06.jpg"
+            "img/01.jpg", // 配列番号0 :01
+            "img/02.jpg", // 配列番号1 :02
+            "img/03.jpg", // 配列番号2 :03
+            "img/04.jpg", // 配列番号3 :04 
+            "img/05.jpg", // 配列番号4 :05
+            "img/06.jpg", // 配列番号5 :06
         ];
+
+        // 親要素を事前に取得
         const sliderInner = document.querySelector(".slider-inner");
         const navContainer = document.querySelector(".nav");
-
+        // ⬛︎ 画像+dotナビゲーションリストを作成
         imgList.forEach((src, i) => {
+            // 画像リスト作成
             const slide = document.createElement("li");
-            slide.innerHTML = `<img src="${src}">`;
+            // 画像タグ作成
+            slide.innerHTML = `<img src=${src}>`;
+            //親要素の子要素としてliを追加
             sliderInner.appendChild(slide);
+            // dotナビゲーションリスト作成
             const nav = document.createElement("li");
+            // 属性値設定
             nav.setAttribute("data-nav-index", i);
+            //親要素の子要素としてliを追加
             navContainer.appendChild(nav);
         });
-
+        // ⬛︎ 作成したDOM要素を取得
+        //画像数からインデックス(配列番号の最大値)を取得
         let length = imgList.length - 1;
-        let nowIndex = 0;
-
+        // querySelectorAllでli要素リストを取得
         const imageSlide = sliderInner.querySelectorAll("li");
         const dotNavigation = navContainer.querySelectorAll("li");
+        // 現在の表示インデックス(配列番号)
+        let nowIndex = 0;
+
+        // ⬛︎ インデックスで画像を選択しクラス追加で表示
         imageSlide[nowIndex].classList.add("show");
         dotNavigation[nowIndex].classList.add("current");
 
+        // ⬛︎ フラグ・タイマー管理
         let isChanging = false;
         let slideTimer;
-        let slideInterval;
 
-        function slideVal() {
-            clearInterval(slideInterval)
-            slideInterval = setInterval(() => {
-                let index = (nowIndex + 1) % imgList.length;
-                sliderSlide(index);
-            }, 3000)
-        };
-
-        slideVal();
-
+        // ⬛︎ スライド切り替え関数
         function sliderSlide(val) {
+            //フラグ設定：動的処理中か確認（isChanging = true）
             if (isChanging === true) {
-                return
+                //条件に一致するならfalseをisChangingに格納
+                isChanging = false;
             }
-            isChanging = true;
+            // クラスの付け替え
             imageSlide[nowIndex].classList.remove("show");
             dotNavigation[nowIndex].classList.remove("current");
             nowIndex = val;
             imageSlide[nowIndex].classList.add("show");
             dotNavigation[nowIndex].classList.add("current");
-            clearTimeout(slideTimer)
+            //処理時間の初期化
+            clearTimeout(slideTimer);
+            // CSSのtransitionの処理時間:600msに合わせて処理時間を設定
             slideTimer = setTimeout(() => {
                 isChanging = false;
             }, 600)
-            slideVal();
         }
-
+        // ⬛︎ クリックイベント：矢印
         document.getElementById("arrow-prev").addEventListener('click', () => {
+            //前に戻るボタンで現在のインデックス(配列)に1つ減算
             let index = nowIndex - 1;
+            //もしインデックスが0以下なら配列番号の最大値を格納
             if (index < 0) {
+                //一番最後の画像
                 index = length;
             }
             sliderSlide(index);
         });
         document.getElementById("arrow-next").addEventListener('click', () => {
+            //次に進むボタンで現在のインデックス(配列)に1つ加算
             let index = nowIndex + 1;
+            //もしインデックスが配列番号の最大値以上なら0を格納
             if (index > length) {
+                //一番最初の画像
                 index = 0;
             }
             sliderSlide(index);
         });
+        // forEachループ処理でリストにイベント設定
         dotNavigation.forEach((nav) => {
             nav.addEventListener('click', () => {
                 let index = Number(nav.getAttribute("data-nav-index"))
-                sliderSlide(index)
+                sliderSlide(index);
             });
         });
-
     </script>
 </body>
 
