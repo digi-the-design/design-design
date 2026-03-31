@@ -46,6 +46,14 @@
 
         let length = imgList.length - 1;
         let nowIndex = 0;
+
+        const imageSlide = sliderInner.querySelectorAll("li");
+        const dotNavigation = navContainer.querySelectorAll("li");
+        imageSlide[nowIndex].classList.add("show");
+        dotNavigation[nowIndex].classList.add("current");
+
+        let isChanging = false;
+        let slideTimer;
         let slideInterval;
 
         function slideVal() {
@@ -57,14 +65,6 @@
         };
 
         slideVal();
-
-        const imageSlide = sliderInner.querySelectorAll("li");
-        const dotNavigation = navContainer.querySelectorAll("li");
-        imageSlide[nowIndex].classList.add("show");
-        dotNavigation[nowIndex].classList.add("current");
-
-        let isChanging = false;
-        let slideTimer;
 
         function sliderSlide(val) {
             if (isChanging === true) {
