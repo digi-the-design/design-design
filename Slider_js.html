@@ -25,12 +25,12 @@
     <script>
         // スライダーに表示する画像のパス
         const imgList = [
-            'img/01.jpg',
-            'img/02.jpg',
-            'img/03.jpg',
-            'img/04.jpg',
-            'img/05.jpg',
-            'img/06.jpg'
+            "img/01.jpg",
+            "img/02.jpg",
+            "img/03.jpg",
+            "img/04.jpg",
+            "img/05.jpg",
+            "img/06.jpg"
         ];
         const sliderInner = document.querySelector(".slider-inner");
         const navContainer = document.querySelector(".nav");
@@ -46,18 +46,20 @@
 
         let length = imgList.length - 1;
         let nowIndex = 0;
-        let intervalTime;
-        function atuoSlide() {
-            clearInterval(intervalTime);
-            intervalTime = setInterval(() => {
+        let slideInterval;
+
+        function slideVal() {
+            clearInterval(slideInterval)
+            slideInterval = setInterval(() => {
                 let index = (nowIndex + 1) % imgList.length;
                 sliderSlide(index);
-            }, 3000);
-        }
-        atuoSlide();
+            }, 3000)
+        };
+
+        slideVal();
+
         const imageSlide = sliderInner.querySelectorAll("li");
         const dotNavigation = navContainer.querySelectorAll("li");
-
         imageSlide[nowIndex].classList.add("show");
         dotNavigation[nowIndex].classList.add("current");
 
@@ -66,18 +68,20 @@
 
         function sliderSlide(val) {
             if (isChanging === true) {
-                isChanging = false;
+                return
             }
+            isChanging = true;
             imageSlide[nowIndex].classList.remove("show");
             dotNavigation[nowIndex].classList.remove("current");
             nowIndex = val;
             imageSlide[nowIndex].classList.add("show");
             dotNavigation[nowIndex].classList.add("current");
-            clearTimeout(slideTimer);
+            clearTimeout(slideTimer)
             slideTimer = setTimeout(() => {
                 isChanging = false;
             }, 600)
-        };
+            slideVal();
+        }
 
         document.getElementById("arrow-prev").addEventListener('click', () => {
             let index = nowIndex - 1;
@@ -95,10 +99,11 @@
         });
         dotNavigation.forEach((nav) => {
             nav.addEventListener('click', () => {
-                let index = Number(nav.getAttribute("data-nav-index"));
-                sliderSlide(index);
+                let index = Number(nav.getAttribute("data-nav-index"))
+                sliderSlide(index)
             });
         });
+
     </script>
 </body>
 
