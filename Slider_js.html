@@ -6,7 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JavaScript File Loading</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* ビデオタグへの指定 */
+        .slider-inner li video {
+            width: 640px;
+            /* 横幅を640pxに固定 */
+            height: auto;
+            /* 高さは比率を維持して自動調整 */
+            display: block;
+            /* 下部の余計な隙間を消す */
+        }
 
+    </style>
 </head>
 
 <body>
@@ -20,102 +31,133 @@
         <p id="arrow-prev" class="arrow">←</p>
         <p id="arrow-next" class="arrow">→</p>
     </div>
-
-
     <script>
-        // スライダーに表示する画像のパス
-        const imgList = [
-            "img/01.jpg", // 配列番号0 :01
-            "img/02.jpg", // 配列番号1 :02
-            "img/03.jpg", // 配列番号2 :03
-            "img/04.jpg", // 配列番号3 :04 
-            "img/05.jpg", // 配列番号4 :05
-            "img/06.jpg", // 配列番号5 :06
-        ];
-
-        // 親要素を事前に取得
         const sliderInner = document.querySelector(".slider-inner");
         const navContainer = document.querySelector(".nav");
-        // ⬛︎ 画像+dotナビゲーションリストを作成
-        imgList.forEach((src, i) => {
-            // 画像リスト作成
+        // スライダーに表示する画像のパス
+        // type:属性判別　src:画像・動画素材パス
+        const imgList = [
+            { type: "img", src: "img/01.jpg", h3: "見出し01", p: "テキストテキストテキスト" },
+            { type: "img", src: "img/02.jpg", h3: "見出し02", p: "テキストテキストテキスト" },
+            { type: "img", src: "img/03.jpg", h3: "見出し03", p: "テキストテキストテキスト" },
+            { type: "img", src: "img/04.jpg", h3: "見出し04", p: "テキストテキストテキスト" },
+            { type: "img", src: "img/05.jpg", h3: "見出し05", p: "テキストテキストテキスト" },
+            { type: "img", src: "img/06.jpg", h3: "見出し06", p: "テキストテキストテキスト" },
+            { type: "video", src: "movie/01.mp4" },
+        ];
+        imgList.forEach((item, i) => {
+            // 画像・動画用リスト
             const slide = document.createElement("li");
-            // 画像タグ作成
-            slide.innerHTML = `<img src=${src}>`;
-            //親要素の子要素としてliを追加
+            const captionBlock = document.createElement("span");
+            // 画像と動画で格納リストコンテナ分岐
+            if (item.type === "video") {
+                slide.innerHTML = `<video src=${item.src}></video>`;
+            } else {
+                slide.innerHTML = `<img src=${item.src}><span><h3>${item.h3}</h3><p>${item.p}</p></span>`;
+            };
             sliderInner.appendChild(slide);
-            // dotナビゲーションリスト作成
             const nav = document.createElement("li");
-            // 属性値設定
             nav.setAttribute("data-nav-index", i);
-            //親要素の子要素としてliを追加
             navContainer.appendChild(nav);
         });
-        // ⬛︎ 作成したDOM要素を取得
-        //画像数からインデックス(配列番号の最大値)を取得
+
         let length = imgList.length - 1;
-        // querySelectorAllでli要素リストを取得
-        const imageSlide = sliderInner.querySelectorAll("li");
-        const dotNavigation = navContainer.querySelectorAll("li");
-        // 現在の表示インデックス(配列番号)
         let nowIndex = 0;
 
-        // ⬛︎ インデックスで画像を選択しクラス追加で表示
-        imageSlide[nowIndex].classList.add("show");
+        const imgSlider = sliderInner.querySelectorAll("li");
+        const dotNavigation = navContainer.querySelectorAll("li");
+
+        let isChanging = false;
+        let sliderTimer;
+        let sliderInterval;
+
+        imgSlider[nowIndex].classList.add("show");
         dotNavigation[nowIndex].classList.add("current");
 
-        // ⬛︎ フラグ・タイマー管理
-        let isChanging = false;
-        let slideTimer;
+        // ⬛︎ 画像用の自動スライダー
+        function autoSlide() {
+            clearInterval(sliderInterval);
+            sliderInterval = setInterval(() => {
+                let index = (nowIndex + 1) % imgList.length;
+                sliderSlide(index);
+            }, 30000)
+        };
 
-        // ⬛︎ スライド切り替え関数
+        autoSlide();
+
+        // ⬛︎ sliderSlide()関数内部の流れ
+        // if(video要素あり)　→　startVideoSlide()　→　else(若しくは)　→　if(画像あり) →　autoSlide()
         function sliderSlide(val) {
-            //フラグ設定：動的処理中か確認（isChanging = true）
-            if (isChanging === true) {
-                //条件に一致するならfalseをisChangingに格納
-                isChanging = false;
-            }
-            // クラスの付け替え
-            imageSlide[nowIndex].classList.remove("show");
+            if (isChanging === true) return;
+            isChanging = true;
+            // startVideoSlide()/autoSlide()内部でsliderSlide()呼び出し処理実行
+            // ⬛︎ 動画リセット
+            // 現在のスライドcurrentMovieが動画であればリセット
+            const currentMovie = imgSlider[nowIndex].querySelector("video");
+            // if(要素名)で要素が存在すれば
+            if (currentMovie) {
+                //動画一時停止
+                currentMovie.pause();
+                //動画の再生位置を先頭にリセット
+                currentMovie.currentTime = 0;
+            };
+            // ⬛︎ nowIndexの値を入れ替える
+            imgSlider[nowIndex].classList.remove("show");
             dotNavigation[nowIndex].classList.remove("current");
             nowIndex = val;
-            imageSlide[nowIndex].classList.add("show");
+            imgSlider[nowIndex].classList.add("show");
             dotNavigation[nowIndex].classList.add("current");
-            //処理時間の初期化
-            clearTimeout(slideTimer);
-            // CSSのtransitionの処理時間:600msに合わせて処理時間を設定
-            slideTimer = setTimeout(() => {
+            // ⬛︎ 次のスライドを設定
+            // 現在のスライドのvideoタグ要素を取得("video");
+            const nextMovie = imgSlider[nowIndex].querySelector("video");
+            //次のスライドが動画か画像かで処理を分岐
+            // if(要素名)要素が存在すれば （現在のスライドが動画なら）以下処理実行
+            if (nextMovie) {
+                // startVideoSlide()関数実行
+                startVideoSlide(nextMovie)
+                //動画でなければ以下処理実行
+            } else {
+                autoSlide();
+            };
+
+            clearTimeout(sliderTimer);
+            sliderTimer = setTimeout(() => {
                 isChanging = false;
             }, 600)
-        }
-        // ⬛︎ クリックイベント：矢印
+        };
+
+        // ⬛︎ 動画専用の再生制御
+        function startVideoSlide(val) {
+            // 画像スライド用sliderInterval初期化
+            clearInterval(sliderInterval);
+            // 現在のvideoタグ要素を再生
+            val.play();
+            // 動画再生終了次第次のスライドに移る .onendedはインベントハンドラ属性
+            val.addEventListener('ended', () => {
+                // 1回実行したら自動的に再生予約リストから消去される設定
+                let index = (nowIndex + 1) % imgList.length;
+                sliderSlide(index)
+            }, { once: true })
+        };
+
+        // 初期実行（1枚目が動画の場合を考慮）
+
         document.getElementById("arrow-prev").addEventListener('click', () => {
-            //前に戻るボタンで現在のインデックス(配列)に1つ減算
             let index = nowIndex - 1;
-            //もしインデックスが0以下なら配列番号の最大値を格納
-            if (index < 0) {
-                //一番最後の画像
-                index = length;
-            }
-            sliderSlide(index);
+            if (index < 0) index = length;
+            sliderSlide(index)
         });
         document.getElementById("arrow-next").addEventListener('click', () => {
-            //次に進むボタンで現在のインデックス(配列)に1つ加算
             let index = nowIndex + 1;
-            //もしインデックスが配列番号の最大値以上なら0を格納
-            if (index > length) {
-                //一番最初の画像
-                index = 0;
-            }
-            sliderSlide(index);
+            if (index > length) index = 0;
+            sliderSlide(index)
         });
-        // forEachループ処理でリストにイベント設定
         dotNavigation.forEach((nav) => {
             nav.addEventListener('click', () => {
                 let index = Number(nav.getAttribute("data-nav-index"))
-                sliderSlide(index);
-            });
-        });
+                sliderSlide(index)
+            })
+        })
     </script>
 </body>
 
